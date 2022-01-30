@@ -1,0 +1,158 @@
+---
+title: "Examining Carbon Correlations and Wildfires"
+author: "Kevin Hernandez and Wilson Bao"
+date: "January 29, 2022"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+Today, we examining two factors that are an concern for the environment:
+(1) C02 Emissions; and
+(2) Wildfires in California
+
+We chose to examine C02 Emission data because it is the main greenhouse gas
+and it correlates with negative health effects.
+We chose to examine wildfires because they are a serious threat in the
+western United States.
+
+First, we import all the relevant packages for our notebook.
+
+```{r}
+library(tidyverse)
+library(stringr)
+library(readxl)
+library(dplyr)
+library(Hmisc)
+library(VIM)
+library(ggplot2)
+library(broom)
+library(ggpubr)
+```
+
+## Carbon Emissions
+![C02](https://www.sciencealert.com/images/articles/processed/carbon_pollution_1024.jpg)
+
+
+We will first examine C02 emission data in 2016.
+We took this data from Kaggle. Source:https://www.kaggle.com/sansuthi/global-co2-emissions
+We first read and prepare the data.
+
+
+```{r}
+Carbon_data <- read.csv("C:/Users/Wilson Bao/Desktop/CO2 Data/Emission_Data.csv")
+Carbon_data2 <- as_tibble(Carbon_data)
+```
+
+We see this data has country names, C02 emissions, population, and life expectancy. Our data is well structure and is not missing any values.
+
+```{r}
+head(Carbon_data2)
+```
+
+
+
+```{r}
+colSums(is.na(Carbon_data2))
+```
+
+We now show a scatter plot and a regression on the C02 emissions and population
+of the country.
+We can see that the top polluters, China, U.S., and India, are the large outliers.
+
+
+```{r}
+emissions <- select(Carbon_data2, CO2Emissions, Population)
+ggplot(emissions, aes(x=Population, y=CO2Emissions)) + geom_point(color='darkblue')
+```
+
+
+
+
+Our regression suggests for every million people in the population, the amount
+of C02 in metric tons increases by 4.951 million.
+
+```{r}
+Carbon_Regression <- lm(CO2Emissions ~ Population, data = emissions)
+summary(Carbon_Regression)
+```
+
+
+When we examine the graph without outliers, we can see the general positive correlation between population and C02 emissions.
+
+```{r}
+Carbon_data3 <- read.csv("C:/Users/Wilson Bao/Desktop/CO2 Data/Emission_Data_Modified.csv")
+Carbon_data4 <- as_tibble(Carbon_data3)
+emissions2 <- select(Carbon_data4, CO2Emissions, Population)
+ggplot(emissions2, aes(x=Population, y=CO2Emissions)) + geom_point(color='darkblue')
+```
+
+## California Wildfires
+
+![Wildfires](https://assets.teenvogue.com/photos/5dceec5a12b1e90009a33c04/16:9/w_2560%2Cc_limit/00-story-california-wildfires.jpg)
+We next examine the wildfires in California.
+
+As we can see from the plot chart, for every increasing year,
+not only is there many incidents of wildfires,
+but there is also larger number of acres being burnt.
+
+```{r}
+California_Fire <- California_Fire_Incidents <- read.csv("C:/Users/Wilson Bao/Desktop/CO2 Data/California_Fire_Incidents.csv")
+California_Fire2 <- select(California_Fire, AcresBurned, ArchiveYear)
+ggplot(California_Fire2, aes(x=AcresBurned, y= ArchiveYear)) + geom_point()
+```
+
+
+
+```{r}
+yearsAcres <- select(California_Fire_Incidents, AcresBurned, ArchiveYear)
+head(yearsAcres)
+
+```
+And as seen in this bar graph, the number of acres burned had a large uptick in 2017 and 2018. Before 2017, the number of acres burned stabilized around 500,000.
+Since then, the problem of wildfires has only increased, and it is imperative
+that protective measures be put in place to stop this trend.
+
+
+
+```{r}
+str(yearsAcres)
+yearsAcres2 <- as.factor(yearsAcres$ArchiveYear)
+TotalByYear <- aggregate(yearsAcres, by=list(yearsAcres$ArchiveYear), FUN=sum)
+TrueYearsAcres <- select(TotalByYear, Group.1, AcresBurned)
+
+options(scipen = 4000000)
+sp <-ggplot(TrueYearsAcres, main = "Wildfire", xlab = "Year", cex.names = .8, aes(x= Group.1, y= AcresBurned)) + geom_bar(stat = "identity")
+
+sp + scale_x_continuous(breaks = seq(2013, 2018, by = 1), name="Year") 
+```
+
+## Conclusion
+
+![C02](https://www.tuev-nord.de/fileadmin/_processed_/8/e/csm_carbon-footprint-tuev-nord_ec81ec2ee7.jpg)
+
+With increasing trends of population, our C02 emissions are likely to increase if trends continue. Furthermore, California wildfires are increasing in the number of incidents and acres burnt, both alarming for people in the west.
+
+That was our presentation, thank you so much.
+
+```{r}
+
+```
+
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
